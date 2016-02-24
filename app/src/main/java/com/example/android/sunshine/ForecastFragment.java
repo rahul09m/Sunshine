@@ -15,9 +15,9 @@ import java.util.List;
 /**
  * A placeholder fragment containing a simple view.
  */
-public class MainActivityFragment extends Fragment {
+public class ForecastFragment extends Fragment {
 
-    public MainActivityFragment() {
+    public ForecastFragment() {
     }
 
     @Override
@@ -36,16 +36,16 @@ public class MainActivityFragment extends Fragment {
                 Arrays.asList(forecastArray));
 
     ArrayAdapter mForecastAdapter= new ArrayAdapter<String>(
-                getActivity(),
+               getActivity(),
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_textview,
                 weekforecast);
-       // View rootview = inflater.inflate(R.layout.fragment_main, container, false);
+       View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-       ListView listview =(ListView) container.findViewById(R.id.listview_forecast);
+       ListView listview =(ListView) rootView.findViewById(R.id.listview_forecast);
         listview.setAdapter(mForecastAdapter);
 
 
-        return inflater.inflate(R.layout.fragment_main, container, false);
+        return rootView;//inflater.inflate(R.layout.fragment_main, container, false);
     }
 }
