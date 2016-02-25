@@ -14,7 +14,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-import android.text.format.Time;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,16 +28,13 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
 import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class ForecastFragment extends Fragment {
-
+    private ArrayAdapter<String> mForecastAdapter;
     public ForecastFragment() {
     }
 
@@ -82,7 +78,7 @@ public class ForecastFragment extends Fragment {
         List<String> weekforecast = new ArrayList<String>(
                 Arrays.asList(forecastArray));
 
-    ArrayAdapter mForecastAdapter= new ArrayAdapter<String>(
+             mForecastAdapter= new ArrayAdapter<String>(
                getActivity(),
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_textview,
@@ -149,21 +145,6 @@ public class ForecastFragment extends Fragment {
             JSONObject forecastJson = new JSONObject(forecastJsonStr);
             JSONArray weatherArray = forecastJson.getJSONArray(OWM_LIST);
 
-            // OWM returns daily forecasts based upon the local time of the city that is being
-            // asked for, which means that we need to know the GMT offset to translate this data
-            // properly.
-
-            // Since this data is also sent in-order and the first day is always the
-            // current day, we're going to take advantage of that to get a nice
-            // normalized UTC date for all of our weather.
-
-            // we start at the day returned by local time. Otherwise this is a mess.
-         //   int julianStartDay = Time.getJulianDay(System.currentTimeMillis(), dayTime.gmtoff);
-           // int currentday = dayTime.get(Calendar.DAY_OF_WEEK);
-
-            // now we work exclusively in UTC
-           // dayTime = new Time();
-
             String[] resultStrs = new String[numDays];
             for (int i = 0; i < weatherArray.length(); i++) {
                 // For now, using the format "Day, description, hi/low"
@@ -199,6 +180,7 @@ public class ForecastFragment extends Fragment {
             }
             return resultStrs;
         }
+
         @Override
         protected String[] doInBackground(String... params) {
             HttpURLConnection urlConnection = null;
@@ -286,5 +268,12 @@ public class ForecastFragment extends Fragment {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(String[] strings) {
+            if (strings != null){
+                    mForecastAdapter.clear();
+                    mForecastAdapter.addAll(strings);
+            }
+        }
     }
 }
