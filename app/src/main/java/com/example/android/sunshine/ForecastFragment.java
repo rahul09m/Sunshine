@@ -1,5 +1,6 @@
 package com.example.android.sunshine;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -12,6 +13,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -35,6 +37,7 @@ import java.util.List;
  */
 public class ForecastFragment extends Fragment {
     private ArrayAdapter<String> mForecastAdapter;
+    private final String LOG_TAG = ForecastFragment.class.getSimpleName();
     public ForecastFragment() {
     }
 
@@ -56,7 +59,7 @@ public class ForecastFragment extends Fragment {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-         if (id == R.id.action_refresh) {
+        if (id == R.id.action_refresh) {
             new FetchWeatherTask().execute("94043");
         }
 
@@ -78,15 +81,27 @@ public class ForecastFragment extends Fragment {
         List<String> weekforecast = new ArrayList<String>(
                 Arrays.asList(forecastArray));
 
-             mForecastAdapter= new ArrayAdapter<String>(
-               getActivity(),
+        mForecastAdapter= new ArrayAdapter<String>(
+                getActivity(),
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_textview,
                 weekforecast);
-       View rootView = inflater.inflate(R.layout.fragment_main, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-       ListView listview =(ListView) rootView.findViewById(R.id.listview_forecast);
+        ListView listview =(ListView) rootView.findViewById(R.id.listview_forecast);
         listview.setAdapter(mForecastAdapter);
+        listview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                String forecast = mForecastAdapter.getItem(position);
+                //String forecast = (String) parent.getItemAtPosition(position);
+                //Toast.makeText(getActivity(),forecast,Toast.LENGTH_SHORT ).show();
+                Intent intent = new Intent(getActivity(),DetailActivity.class)
+                        .putExtra(Intent.EXTRA_TEXT,forecast);
+                startActivity(intent);
+            }
+        });
 
 
         return rootView;//inflater.inflate(R.layout.fragment_main, container, false);
@@ -101,7 +116,7 @@ public class ForecastFragment extends Fragment {
             // it must be converted to milliseconds in order to be converted to valid date.
             //Date date = new Date(time*1000);
             Log.d(LOG_TAG,"Time: "+ time);
-           // Calendar time = time.getTimeInMillis();
+            // Calendar time = time.getTimeInMillis();
             SimpleDateFormat shortenedDateFormat = new SimpleDateFormat("EEE MMM dd");
             //Calendar calendar = Calendar.getInstance();
             //calendar.setTimeInMillis(time);
@@ -195,7 +210,7 @@ public class ForecastFragment extends Fragment {
                 // Construct the URL for the OpenWeatherMap query
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
-              //  URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&"mode=json&units=metric&cnt=7&appid=44db6a862fba0b067b1930da0d769e98");
+                //  URL url = new URL("http://api.openweathermap.org/data/2.5/forecast/daily?q=94043&"mode=json&units=metric&cnt=7&appid=44db6a862fba0b067b1930da0d769e98");
                 final String BASE_URL = "http://api.openweathermap.org/data/2.5/forecast/daily?";
                 final String QUERY_PARAM = "q";
                 final String FORMAT_PARAM = "mode";
@@ -271,8 +286,8 @@ public class ForecastFragment extends Fragment {
         @Override
         protected void onPostExecute(String[] strings) {
             if (strings != null){
-                    mForecastAdapter.clear();
-                    mForecastAdapter.addAll(strings);
+                mForecastAdapter.clear();
+                mForecastAdapter.addAll(strings);
             }
         }
     }
