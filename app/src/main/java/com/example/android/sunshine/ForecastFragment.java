@@ -1,11 +1,14 @@
 package com.example.android.sunshine;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -60,17 +63,25 @@ public class ForecastFragment extends Fragment {
         int id = item.getItemId();
 
         if (id == R.id.action_refresh) {
-            new FetchWeatherTask().execute("94043");
+           updateWeather();
         }
 
 
         return super.onOptionsItemSelected(item);
     }
 
+    private void updateWeather(){
+        FetchWeatherTask weatherTask = new FetchWeatherTask();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = prefs.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+        weatherTask.execute(location);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-        String[] forecastArray ={
+    /*    String[] forecastArray ={
                 "Today - Sunny 88/63",
                 "Tomorrow - gijasdf 234",
                 "weds - 23 243 23  ",
@@ -80,13 +91,13 @@ public class ForecastFragment extends Fragment {
                 "sunday - 2341234"
         };
         List<String> weekforecast = new ArrayList<String>(
-                Arrays.asList(forecastArray));
+                Arrays.asList(forecastArray));*/
 
         mForecastAdapter= new ArrayAdapter<String>(
                 getActivity(),
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_textview,
-                weekforecast);
+                new ArrayList<String>());
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
         ListView listview =(ListView) rootView.findViewById(R.id.listview_forecast);
@@ -106,6 +117,12 @@ public class ForecastFragment extends Fragment {
 
 
         return rootView;//inflater.inflate(R.layout.fragment_main, container, false);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
     }
 
     private class FetchWeatherTask extends AsyncTask<String,Void,String[]> {
