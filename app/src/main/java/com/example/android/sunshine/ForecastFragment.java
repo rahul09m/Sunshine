@@ -254,7 +254,7 @@ public class ForecastFragment extends Fragment {
                         .appendQueryParameter(UNITS_PARAM, units)
                         .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
                       //  .appendQueryParameter(APPID_PARAM,getString(R.string.api_key))
-                        .appendQueryParameter(APPID_PARAM,BuildConfig.MY_API_KEY)
+                        .appendQueryParameter(APPID_PARAM,BuildConfig.API_KEY)
                         .build();
 
                 URL url = new URL(builtUri.toString());
